@@ -119,7 +119,8 @@ export default {
 			let req_data = MainData;
 
 			let 追加UA = 'v2rayn';
-			if (url.searchParams.has('clash')) 追加UA = 'clash';
+			if (url.searchParams.has('b64') || url.searchParams.has('base64')) 订阅格式 = 'base64';
+			else if (url.searchParams.has('clash')) 追加UA = 'clash';
 			else if (url.searchParams.has('singbox')) 追加UA = 'singbox';
 			else if (url.searchParams.has('surge')) 追加UA = 'surge';
 			else if (url.searchParams.has('quanx')) 追加UA = 'Quantumult%20X';
@@ -167,7 +168,7 @@ export default {
 					return base64.slice(0, base64.length - padding) + '=='.slice(0, padding);
 				}
 
-				base64Data = encodeBase64(result);
+				base64Data = encodeBase64(result.replace(/\u0026/g, '&'))
 			}
 
 			if (订阅格式 == 'base64' || token == fakeToken) {
@@ -464,7 +465,15 @@ async function getUrl(request, targetUrl, 追加UA, userAgentHeader) {
 		method: request.method,
 		headers: newHeaders,
 		body: request.method === "GET" ? null : request.body,
-		redirect: "follow"
+		redirect: "follow",
+		cf: {
+			// 忽略SSL证书验证
+			insecureSkipVerify: true,
+			// 允许自签名证书
+			allowUntrusted: true,
+			// 禁用证书验证
+			validateCertificate: false
+		}
 	});
 
 	// 输出请求的详细信息
@@ -595,7 +604,7 @@ async function KV(request, env, txt = 'ADD.txt', guest) {
 					Subscribe / sub 订阅地址, 点击链接自动 <strong>复制订阅链接</strong> 并 <strong>生成订阅二维码</strong> <br>
 					---------------------------------------------------------------<br>
 					自适应订阅地址:<br>
-					<a href="javascript:void(0)" onclick="copyToClipboard('https://${url.hostname}/${mytoken}?b64','qrcode_0')" style="color:blue;text-decoration:underline;cursor:pointer;">https://${url.hostname}/${mytoken}</a><br>
+					<a href="javascript:void(0)" onclick="copyToClipboard('https://${url.hostname}/${mytoken}?sub','qrcode_0')" style="color:blue;text-decoration:underline;cursor:pointer;">https://${url.hostname}/${mytoken}</a><br>
 					<div id="qrcode_0" style="margin: 10px 10px 10px 10px;"></div>
 					Base64订阅地址:<br>
 					<a href="javascript:void(0)" onclick="copyToClipboard('https://${url.hostname}/${mytoken}?b64','qrcode_1')" style="color:blue;text-decoration:underline;cursor:pointer;">https://${url.hostname}/${mytoken}?b64</a><br>
